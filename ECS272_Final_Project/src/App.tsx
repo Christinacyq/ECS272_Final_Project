@@ -83,15 +83,25 @@ function Layout() {
         style={{
           height: '100vh',
           scrollSnapAlign: 'start',
-          padding: '20px',
           backgroundColor: '#e0e0e0',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
-        
-        
+        <Histogram
+          selectedRange={[1997, 2024]}
+          selectedBillionaire={null}
+          setSelectedBillionaire={() => {}}
+          useRange={true}
+          widthScale={0.95}
+          heightScale={0.95}
+          titleFontSize='24px'
+        />
       </div>
 
-      {/* Page 3 */}
+
+      {/* Page 4 */}
       <div
         style={{
           height: '100vh',
@@ -104,9 +114,9 @@ function Layout() {
         
       </div>
 
-      {/* Page 4 */}
+      {/* Page 5 */}
       {/* Last Page: Interactive Dashboard */}
-<div
+      <div
   style={{
     height: '100vh',
     scrollSnapAlign: 'start',
