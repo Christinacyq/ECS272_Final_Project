@@ -110,7 +110,20 @@ function Layout() {
           backgroundColor: '#f0f0f0',
         }}
       >
-        
+      <BumpChart
+        selectedRange={[2020, 2024]} // Provide default range for interactive filtering
+        selectedCountry=""
+        setCountry={() => {}}
+        setSelectedBillionaire={() => {}}
+        selectedYear={2024} // Default year for selection
+        setSelectedYear={() => {}}
+        colorScale={colorScale}
+        fixedCountry="South Korea" // Fixed country for this chart
+        fixedRange={[2020, 2024]} // Fixed range for this chart
+        widthScale={0.95}
+        heightScale={0.95}
+        hideCountrySelector={true}
+      />
         
       </div>
 

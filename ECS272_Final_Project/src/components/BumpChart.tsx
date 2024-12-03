@@ -1,7 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const BumpChart = ({ selectedRange, selectedCountry, setCountry, setSelectedBillionaire, selectedYear, setSelectedYear, colorScale }) => {
+const BumpChart = ({
+  selectedRange,
+  selectedCountry,
+  setCountry,
+  setSelectedBillionaire,
+  selectedYear,
+  setSelectedYear,
+  colorScale,
+  fixedCountry = null,
+  fixedRange = null,
+  widthScale = 0.5,
+  heightScale = 0.8,
+  hideCountrySelector = false,
+}) => {
   const svgRef = useRef();
   const tooltipRef = useRef();
   const [data, setData] = useState([]);
@@ -10,8 +23,8 @@ const BumpChart = ({ selectedRange, selectedCountry, setCountry, setSelectedBill
   const [maxNetWorth, setMaxNetWorth] = useState(0);
   const [clickedBillionaire, setClickedBillionaire] = useState(null); // Add clicked state
   const [dimensions, setDimensions] = useState({
-    width: window.innerWidth * 0.5,
-    height: window.innerHeight * 0.8,
+    width: window.innerWidth * widthScale,
+    height: window.innerHeight * heightScale,
   });
   
 
@@ -20,8 +33,8 @@ const BumpChart = ({ selectedRange, selectedCountry, setCountry, setSelectedBill
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
-        width: window.innerWidth * 0.5,
-        height: window.innerHeight * 0.8,
+        width: window.innerWidth * widthScale,
+        height: window.innerHeight * heightScale,
       });
     };
     window.addEventListener("resize", handleResize);
@@ -30,42 +43,41 @@ const BumpChart = ({ selectedRange, selectedCountry, setCountry, setSelectedBill
 
 
   useEffect(() => {
-    d3.csv("data/concatenated_full.csv").then((allData) => {
+      d3.csv("data/concatenated_full.csv").then((allData) => {
       const globalMaxNetWorth = d3.max(allData, (d) => +d["Net Worth($US billion)"]);
       setMaxNetWorth(globalMaxNetWorth);
 
       const uniqueIndustries = Array.from(new Set(allData.map((d) => d.Category)));
-
       setIndustries(uniqueIndustries);
 
+      // Apply fixed range or selected range
+      const range = fixedRange || selectedRange;
       const rangeData = allData.filter(
-        (d) => +d.Year >= selectedRange[0] && +d.Year <= selectedRange[1]
+        (d) => +d.Year >= range[0] && +d.Year <= range[1]
       );
 
-      setSelectedYear(null);
-      setSelectedBillionaire(null);
-      setClickedBillionaire(null);
+      // Apply fixed country or selected country
+      const country = fixedCountry || selectedCountry;
+      const finalData = rangeData.filter(
+        (d) => country === "" || d.Citizenship === country
+      );
 
-      const groupedByYear = d3.group(rangeData, (d) => d.Year);
+      // Group and sort by year for top 20 rankings
+      const groupedByYear = d3.group(finalData, (d) => d.Year);
       const slicedData = Array.from(groupedByYear, ([year, entries]) => {
         const top20 = entries.sort((a, b) => +a.Rank - +b.Rank).slice(0, 20);
         return top20;
       }).flat();
 
-      const uniqueCountries = Array.from(new Set(slicedData.map((d) => d.Citizenship)));
-      setCountries(uniqueCountries);
+      setData(slicedData);
 
-      const finalData =
-        selectedCountry !== ""
-          ? slicedData.filter((d) => d.Citizenship === selectedCountry)
-          : slicedData;
-
-      setData(finalData);
-
-      console.log("Selected Country:", selectedCountry); // Debugging
-      console.log("Filtered Data:", finalData); // Debugging
+      if (!fixedCountry) {
+        // Update available countries only if not fixed
+        const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Citizenship)));
+        setCountries(uniqueCountries);
+      }
     });
-  }, [selectedRange, selectedCountry]);
+  }, [selectedRange, selectedCountry, fixedCountry, fixedRange]);
 
   // Draw the chart
   useEffect(() => {
@@ -208,28 +220,30 @@ const BumpChart = ({ selectedRange, selectedCountry, setCountry, setSelectedBill
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-        <div>
-          <label style={{ fontWeight: "bold", marginRight: 5, marginLeft: 20 }}>Select Country:</label>
-          <select value={selectedCountry} onChange={(e) => setCountry(e.target.value)}>
-            <option value="">All Countries</option>
-            {countries.map((country) => (
-              <option key={country} value={country}>
-                {country}
-              </option>
-            ))}
-          </select>
+      {!hideCountrySelector && ( // Conditionally render the dropdown
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+          <div>
+            <label style={{ fontWeight: "bold", marginRight: 5, marginLeft: 20 }}>Select Country:</label>
+            <select value={selectedCountry} onChange={(e) => setCountry(e.target.value)}>
+              <option value="">All Countries</option>
+              {countries.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={() => {
+              setClickedBillionaire(null);
+              setSelectedYear(null);
+              setSelectedBillionaire(null);
+            }}
+          >
+            Reset
+          </button>
         </div>
-        <button
-          onClick={() => {
-            setClickedBillionaire(null);
-            setSelectedYear(null);
-            setSelectedBillionaire(null);
-          }}
-        >
-          Reset
-        </button>
-      </div>
+      )}
       <div
         ref={tooltipRef}
         style={{
