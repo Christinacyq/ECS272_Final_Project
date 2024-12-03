@@ -59,7 +59,7 @@ const BumpChart = ({
       // Apply fixed country or selected country
       const country = fixedCountry || selectedCountry;
       const finalData = rangeData.filter(
-        (d) => country === "" || d.Location === country
+        (d) => country === "" || d.Citizenship === country
       );
 
       // Group and sort by year for top 20 rankings
@@ -70,7 +70,7 @@ const BumpChart = ({
       if (selectedCountry) {
         // If fixedCountry is specified, limit entries to this country before grouping
         groupedByYear = d3.group(
-          rangeData.filter((d) => d.Location === selectedCountry),
+          rangeData.filter((d) => d.Citizenship === selectedCountry),
           (d) => d.Year
         );
         slicedData = Array.from(groupedByYear, ([year, entries]) => {
@@ -92,7 +92,7 @@ const BumpChart = ({
 
       if (!fixedCountry) {
         // Update available countries only if not fixed
-        const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Location)));
+        const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Citizenship)));
         setCountries(uniqueCountries);
       }
     });
