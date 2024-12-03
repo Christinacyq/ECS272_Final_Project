@@ -59,21 +59,40 @@ const BumpChart = ({
       // Apply fixed country or selected country
       const country = fixedCountry || selectedCountry;
       const finalData = rangeData.filter(
-        (d) => country === "" || d.Citizenship === country
+        (d) => country === "" || d.Location === country
       );
 
       // Group and sort by year for top 20 rankings
-      const groupedByYear = d3.group(finalData, (d) => d.Year);
-      const slicedData = Array.from(groupedByYear, ([year, entries]) => {
-        const top20 = entries.sort((a, b) => +a.Rank - +b.Rank).slice(0, 20);
-        return top20;
-      }).flat();
+      // const groupedByYear = d3.group(finalData, (d) => d.Year);
+      let groupedByYear;
+      let slicedData;
+
+      if (selectedCountry) {
+        // If fixedCountry is specified, limit entries to this country before grouping
+        groupedByYear = d3.group(
+          rangeData.filter((d) => d.Location === selectedCountry),
+          (d) => d.Year
+        );
+        slicedData = Array.from(groupedByYear, ([year, entries]) => {
+          return entries
+            .sort((a, b) => +a.Rank - +b.Rank) // Sort by original rank
+            .slice(0, 20) // Select the top 20 entries
+            .map((entry, index) => ({ ...entry, Rank: index + 1 })); // Reassign Rank to 1-20
+        }).flat();
+      } else {
+        // Otherwise, include entries from all countries
+        groupedByYear = d3.group(finalData, (d) => d.Year);
+        slicedData = Array.from(groupedByYear, ([year, entries]) => {
+          const top20 = entries.sort((a, b) => +a.Rank - +b.Rank).slice(0, 20);
+          return top20;
+        }).flat();
+      }
 
       setData(slicedData);
 
       if (!fixedCountry) {
         // Update available countries only if not fixed
-        const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Citizenship)));
+        const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Location)));
         setCountries(uniqueCountries);
       }
     });

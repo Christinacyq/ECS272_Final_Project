@@ -33,11 +33,11 @@ function Layout() {
       const uniqueIndustries = Array.from(new Set(allData.map((d) => d.Category)));
       const scale = d3.scaleOrdinal(d3.schemeTableau10).domain(uniqueIndustries);
       setColorScale(() => scale);
-      console.log("Generated Color Scale:", scale.domain(), scale.range());
+      // console.log("Generated Color Scale:", scale.domain(), scale.range());
     });
   }, []);
 
-  console.log(selectedYear);
+  // console.log(selectedYear);
 
   return (
     <div
@@ -112,7 +112,7 @@ function Layout() {
       >
       <BumpChart
         selectedRange={[2020, 2024]} // Provide default range for interactive filtering
-        selectedCountry=""
+        selectedCountry="South Korea"
         setCountry={() => {}}
         setSelectedBillionaire={() => {}}
         selectedYear={2024} // Default year for selection

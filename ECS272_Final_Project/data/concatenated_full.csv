@@ -4073,7 +4073,7 @@ Year,Rank,Name,Net Worth($US billion),Citizenship,Category,Location
 2007,295,Maurice Greenberg,3.0,USA,Finance,USA
 2007,296,Otto Happel,3.0,Germany,Manufacturing,Germany
 2007,297,Henry Hillman,3.0,USA,Finance,USA
-2007,298,Indu Jain*,3.0,India,Media,India
+2007,298,Indu Jain,3.0,India,Media,India
 2007,299,Bruce Kovner,3.0,USA,Finance,USA
 2007,300,Ronald Lauder,3.0,USA,Fashion,USA
 2007,301,Fredrik Lundberg,3.0,Sweden,Finance,Sweden
@@ -12175,9 +12175,7 @@ Year,Rank,Name,Net Worth($US billion),Citizenship,Category,Location
 2023,397,Carl Bennet,6.4,Sweden,Finance,Sweden
 2023,398,Stephen Bisciotti,6.4,USA,Media,USA
 2023,399,Stanley Druckenmiller,6.4,USA,Finance,USA
-2023,400,Jian Jun,6.4,China,Healthcare,"China**
-
-If this doesn't align with your research, let me know"
+2023,400,Jian Jun,6.4,China,Healthcare,China
 2023,401,Alexei Kuzmichev,6.4,Russia,Energy,Luxembourg
 2023,402,Dmitry Rybolovlev & Family,6.4,Russia,Manufacturing,Russia
 2023,403,Luis Carlos Sarmiento,6.4,Colombia,Finance,Colombia
