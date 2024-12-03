@@ -9,8 +9,6 @@ const BumpChart = ({
   selectedYear,
   setSelectedYear,
   colorScale,
-  fixedCountry = null,
-  fixedRange = null,
   widthScale = 0.5,
   heightScale = 0.8,
   hideCountrySelector = false,
@@ -50,14 +48,14 @@ const BumpChart = ({
       const uniqueIndustries = Array.from(new Set(allData.map((d) => d.Category)));
       setIndustries(uniqueIndustries);
 
-      // Apply fixed range or selected range
-      const range = fixedRange || selectedRange;
+      // Apply selected range
+      const range = selectedRange;
       const rangeData = allData.filter(
         (d) => +d.Year >= range[0] && +d.Year <= range[1]
       );
 
-      // Apply fixed country or selected country
-      const country = fixedCountry || selectedCountry;
+      // Apply selected country
+      const country = selectedCountry;
       const finalData = rangeData.filter(
         (d) => country === "" || d.Citizenship === country
       );
@@ -68,7 +66,7 @@ const BumpChart = ({
       let slicedData;
 
       if (selectedCountry) {
-        // If fixedCountry is specified, limit entries to this country before grouping
+        // If selectedCountry is specified, limit entries to this country before grouping
         groupedByYear = d3.group(
           rangeData.filter((d) => d.Citizenship === selectedCountry),
           (d) => d.Year
@@ -90,13 +88,15 @@ const BumpChart = ({
 
       setData(slicedData);
 
-      if (!fixedCountry) {
-        // Update available countries only if not fixed
-        const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Citizenship)));
-        setCountries(uniqueCountries);
-      }
+      // if (!fixedCountry) {
+      //   // Update available countries only if not fixed
+      //   const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Citizenship)));
+      //   setCountries(uniqueCountries);
+      // }
+      const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Citizenship)));
+      setCountries(uniqueCountries);
     });
-  }, [selectedRange, selectedCountry, fixedCountry, fixedRange]);
+  }, [selectedRange, selectedCountry]);
 
   // Draw the chart
   useEffect(() => {

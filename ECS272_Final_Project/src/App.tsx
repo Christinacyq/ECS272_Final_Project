@@ -118,8 +118,6 @@ function Layout() {
         selectedYear={2024} // Default year for selection
         setSelectedYear={() => {}}
         colorScale={colorScale}
-        fixedCountry="South Korea" // Fixed country for this chart
-        fixedRange={[2020, 2024]} // Fixed range for this chart
         widthScale={0.95}
         heightScale={0.95}
         hideCountrySelector={true}
