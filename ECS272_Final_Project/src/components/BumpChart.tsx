@@ -9,6 +9,7 @@ const BumpChart = ({
   selectedYear,
   setSelectedYear,
   colorScale,
+  maxRank = 20,
   widthScale = 0.5,
   heightScale = 0.8,
   hideCountrySelector = false,
@@ -74,7 +75,7 @@ const BumpChart = ({
         slicedData = Array.from(groupedByYear, ([year, entries]) => {
           return entries
             .sort((a, b) => +a.Rank - +b.Rank) // Sort by original rank
-            .slice(0, 20) // Select the top 20 entries
+            .slice(0, maxRank) // Select the top 20 entries
             .map((entry, index) => ({ ...entry, Rank: index + 1 })); // Reassign Rank to 1-20
         }).flat();
       } else {
@@ -88,11 +89,6 @@ const BumpChart = ({
 
       setData(slicedData);
 
-      // if (!fixedCountry) {
-      //   // Update available countries only if not fixed
-      //   const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Citizenship)));
-      //   setCountries(uniqueCountries);
-      // }
       const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Citizenship)));
       setCountries(uniqueCountries);
     });
