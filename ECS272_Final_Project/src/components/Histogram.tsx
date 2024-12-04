@@ -1,20 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-const Histogram = ({ selectedRange, selectedBillionaire, setSelectedBillionaire }) => {
+const Histogram = ({ selectedRange, 
+  selectedBillionaire, 
+  setSelectedBillionaire,
+  useRange = false,
+  widthScale = 0.45, 
+  heightScale = 0.4,
+  titleFontSize = "16px" }) => {
   const svgRef = useRef();
   const tooltipRef = useRef();
   const [data, setData] = useState([]);
   const [dimensions, setDimensions] = useState({
-    width: window.innerWidth * 0.45,
-    height: window.innerHeight * 0.4,
+    width: window.innerWidth * widthScale,
+    height: window.innerHeight * heightScale,
   });
-
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
-        width: window.innerWidth * 0.45,
-        height: window.innerHeight * 0.4,
+        width: window.innerWidth * widthScale,
+        height: window.innerHeight * heightScale,
       });
     };
     window.addEventListener("resize", handleResize);
@@ -29,17 +34,19 @@ const Histogram = ({ selectedRange, selectedBillionaire, setSelectedBillionaire 
 
     d3.csv("data/concatenated_full.csv").then((allData) => {
       // Filter data by the determined year
-      const filteredData = allData.filter((d) => +d.Year === +yearToFilter);
+      const filteredData = useRange
+        ? allData.filter((d) => +d.Year >= selectedRange[0] && +d.Year <= selectedRange[1])
+        : allData.filter((d) => +d.Year === +yearToFilter);
 
       // Group data by country and count the number of billionaires
-      const countryCounts = d3.rollup(
+      const dataAggregation = d3.rollup(
         filteredData,
-        (v) => v.length,
+        (v) => new Set(v.map((d) => d.Name)).size, // Unique billionaire count
         (d) => d.Citizenship
       );
 
       // Convert to an array of objects for easier D3 manipulation
-      const histogramData = Array.from(countryCounts, ([country, count]) => ({
+      const histogramData = Array.from(dataAggregation, ([country, count]) => ({
         country,
         count,
       }));
@@ -51,7 +58,7 @@ const Histogram = ({ selectedRange, selectedBillionaire, setSelectedBillionaire 
 
       setData(top20Data);
     });
-  }, [selectedRange, selectedBillionaire]); // Dependencies
+  }, [selectedRange, selectedBillionaire, useRange, widthScale, heightScale]); // Dependencies
 
   useEffect(() => {
     if (!data.length) return;
@@ -130,18 +137,25 @@ const Histogram = ({ selectedRange, selectedBillionaire, setSelectedBillionaire 
       .call(yAxis);
 
     // Title
+    const title_year = useRange ?
+      `${selectedRange[0]} - ${selectedRange[1]}`: selectedBillionaire 
+      ? selectedBillionaire.Year : selectedRange[1];
+
     svg
       .append("text")
       .attr("x", width / 2 + 20)
       .attr("y", margin.top / 2 + 20)
       .attr("text-anchor", "middle")
-      .attr("font-size", "16px")
+      .attr("font-size", titleFontSize)
       .attr("font-weight", "bold")
       .text(
-        `Top 20 Countries by Number of Billionaires in Year ${
-          selectedBillionaire ? selectedBillionaire.Year : selectedRange[1]
-        }`
+        `Top 20 Countries by Number of Billionaires in Year ${title_year}`
       );
+      // .text(
+      //   `Top 20 Countries by Number of Billionaires in Year ${
+      //     selectedBillionaire ? selectedBillionaire.Year : selectedRange[1]
+      //   }`
+      // );
   }, [data, dimensions]);
 
   return (

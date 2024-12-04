@@ -31,7 +31,7 @@ const SankeyDiagram = ({ selectedRange, selectedBillionaire, selectedYear, setSe
 
   useEffect(() => {
     d3.csv("data/concatenated_full.csv").then((allData) => {
-      console.log("Filtering by year:", yearToFilter);
+      // console.log("Filtering by year:", yearToFilter);
   
       const yearData = allData.filter((d) => +d.Year === +yearToFilter);
   
@@ -207,7 +207,7 @@ const SankeyDiagram = ({ selectedRange, selectedBillionaire, selectedYear, setSe
       .enter()
       .append("path")
       .attr("d", (d) => {
-        console.log(d);
+        // console.log(d);
         const sourceNode = nodePositions[d.source];
         const targetNode = nodePositions[d.target];
         const x1 = sourceNode.x + 5;

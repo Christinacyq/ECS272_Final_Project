@@ -23,6 +23,9 @@ const theme = createTheme({
 
 function Layout() {
   const [selectedRange, setRange] = useState([2020, 2024]);
+  const [page2Range, setPage2Range] = useState([1997, 2023]);
+  const [page2Buttons, setPage2Buttons] = useState(['Left', 'Right']);
+  const [page2Title, setPage2Title] = useState("Billionaire Growth and World GDP");
   const [selectedCountry, setCountry] = useState("");
   const [selectedBillionaire, setSelectedBillionaire] = useState(null);
   const [selectedYear, setSelectedYear] = useState(selectedRange[1]);
@@ -33,11 +36,27 @@ function Layout() {
       const uniqueIndustries = Array.from(new Set(allData.map((d) => d.Category)));
       const scale = d3.scaleOrdinal(d3.schemeTableau10).domain(uniqueIndustries);
       setColorScale(() => scale);
-      console.log("Generated Color Scale:", scale.domain(), scale.range());
+      // console.log("Generated Color Scale:", scale.domain(), scale.range());
     });
   }, []);
 
-  console.log(selectedYear);
+  // console.log(selectedYear);
+
+  const handlePage2ButtonClick = (button) => {
+    if (button === 'Left') {
+      setPage2Range([1997, 2010]);
+      setPage2Buttons(['All', 'Right']);
+      setPage2Title("Billionaire Growth and World GDP between Year 1997-2010");
+    } else if (button === 'Right') {
+      setPage2Range([2010, 2023]);
+      setPage2Buttons(['Left', 'All']);
+      setPage2Title("Billionaire Growth and World GDP between Year 2010-2023");
+    } else if (button === 'All') {
+      setPage2Range([1997, 2023]);
+      setPage2Buttons(['Left', 'Right']);
+      setPage2Title("Billionaire Growth and World GDP");
+    }
+  };
 
   return (
     <div
@@ -72,26 +91,68 @@ function Layout() {
           scrollSnapAlign: 'start',
           padding: '20px',
           backgroundColor: '#d0d0d0',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          position: 'relative',
         }}
       >
-        <BarLineChart/> 
-
+        <BarLineChart selectedRange={page2Range} title={page2Title}/>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '100px',
+            right: '20px',
+            display: 'flex',
+            gap: '10px',
+          }}
+        >
+          {page2Buttons.map((button, index) => (
+            <button
+              key={index}
+              onClick={() => handlePage2ButtonClick(button)}
+              style={{
+                padding: '10px 20px',
+                fontSize: '16px',
+                backgroundColor: '#8884d8',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              {button}
+            </button>
+          ))}
+        </div>
       </div>
+
 
       {/* Page 3 */}
       <div
         style={{
           height: '100vh',
           scrollSnapAlign: 'start',
-          padding: '20px',
           backgroundColor: '#e0e0e0',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
-        
-        
+        <Histogram
+          selectedRange={[1997, 2024]}
+          selectedBillionaire={null}
+          setSelectedBillionaire={() => {}}
+          useRange={true}
+          widthScale={0.95}
+          heightScale={0.95}
+          titleFontSize='24px'
+        />
       </div>
 
-      {/* Page 3 */}
+
+      {/* Page 4 */}
       <div
         style={{
           height: '100vh',
@@ -100,13 +161,24 @@ function Layout() {
           backgroundColor: '#f0f0f0',
         }}
       >
-        
+      <BumpChart
+        selectedRange={[2020, 2024]}
+        selectedCountry="South Korea"
+        setCountry={() => {}}
+        setSelectedBillionaire={() => {}}
+        selectedYear={2024}
+        setSelectedYear={() => {}}
+        colorScale={colorScale}
+        widthScale={0.95}
+        heightScale={0.95}
+        hideCountrySelector={true}
+      />
         
       </div>
 
-      {/* Page 4 */}
+      {/* Page 5 */}
       {/* Last Page: Interactive Dashboard */}
-<div
+      <div
   style={{
     height: '100vh',
     scrollSnapAlign: 'start',
