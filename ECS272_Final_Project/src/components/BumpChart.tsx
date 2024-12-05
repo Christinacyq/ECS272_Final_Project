@@ -13,6 +13,7 @@ const BumpChart = ({
   widthScale = 0.5,
   heightScale = 0.8,
   hideCountrySelector = false,
+  enableInteraction = true,
 }) => {
   const svgRef = useRef();
   const tooltipRef = useRef();
@@ -40,60 +41,67 @@ const BumpChart = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-
   useEffect(() => {
-      d3.csv("data/concatenated_full.csv").then((allData) => {
-      const globalMaxNetWorth = d3.max(allData, (d) => +d["Net Worth($US billion)"]);
+    d3.csv("data/concatenated_full.csv").then((allData) => {
+      // Add GlobalRank attribute
+      const allDataWithGlobalRank = allData.map((entry) => ({
+        ...entry,
+        GlobalRank: entry.Rank, // Copy Rank to GlobalRank
+      }));
+  
+      // Calculate the global max net worth for size scaling
+      const globalMaxNetWorth = d3.max(allDataWithGlobalRank, (d) => +d["Net Worth($US billion)"]);
       setMaxNetWorth(globalMaxNetWorth);
-
-      const uniqueIndustries = Array.from(new Set(allData.map((d) => d.Category)));
+  
+      // Extract unique industries for the legend
+      const uniqueIndustries = Array.from(new Set(allDataWithGlobalRank.map((d) => d.Category)));
       setIndustries(uniqueIndustries);
-
-      // Apply selected range
-      const range = selectedRange;
-      const rangeData = allData.filter(
-        (d) => +d.Year >= range[0] && +d.Year <= range[1]
+  
+      // Filter data within the selected range
+      const rangeData = allDataWithGlobalRank.filter(
+        (d) => +d.Year >= selectedRange[0] && +d.Year <= selectedRange[1]
       );
-
-      // Apply selected country
-      const country = selectedCountry;
-      const finalData = rangeData.filter(
-        (d) => country === "" || d.Citizenship === country
-      );
-
-      // Group and sort by year for top 20 rankings
-      // const groupedByYear = d3.group(finalData, (d) => d.Year);
-      let groupedByYear;
-      let slicedData;
-
+  
+      let finalData;
+  
       if (selectedCountry) {
-        // If selectedCountry is specified, limit entries to this country before grouping
-        groupedByYear = d3.group(
-          rangeData.filter((d) => d.Citizenship === selectedCountry),
-          (d) => d.Year
-        );
-        slicedData = Array.from(groupedByYear, ([year, entries]) => {
+        // Filter data by the selected country
+        const countryData = rangeData.filter((d) => d.Citizenship === selectedCountry);
+  
+        // Assign DomesticRank for the selected country
+        const groupedByYear = d3.group(countryData, (d) => d.Year);
+        Array.from(groupedByYear, ([year, entries]) => {
+          entries
+            .sort((a, b) => +a.GlobalRank - +b.GlobalRank) // Sort by GlobalRank
+            .forEach((entry, index) => {
+              entry.Rank = index + 1; // Reassign Rank as DomesticRank
+            });
+        });
+  
+        // Limit the data to `maxRank` using DomesticRank
+        finalData = Array.from(groupedByYear, ([year, entries]) => {
           return entries
-            .sort((a, b) => +a.Rank - +b.Rank) // Sort by original rank
-            .slice(0, maxRank) // Select the top 20 entries
-            .map((entry, index) => ({ ...entry, Rank: index + 1 })); // Reassign Rank to 1-20
+            .sort((a, b) => +a.Rank - +b.Rank)
+            .slice(0, maxRank);
         }).flat();
       } else {
-        // Otherwise, include entries from all countries
-        groupedByYear = d3.group(finalData, (d) => d.Year);
-        slicedData = Array.from(groupedByYear, ([year, entries]) => {
-          const top20 = entries.sort((a, b) => +a.Rank - +b.Rank).slice(0, 20);
-          return top20;
+        // No country selected: Use GlobalRank and do not modify Rank
+        const groupedByYear = d3.group(rangeData, (d) => d.Year);
+        finalData = Array.from(groupedByYear, ([year, entries]) => {
+          return entries
+            .sort((a, b) => +a.GlobalRank - +b.GlobalRank)
+            .slice(0, maxRank);
         }).flat();
       }
-
-      setData(slicedData);
-
+  
+      setData(finalData);
+  
+      // Extract unique countries for the dropdown
       const uniqueCountries = Array.from(new Set(rangeData.map((d) => d.Citizenship)));
       setCountries(uniqueCountries);
     });
-  }, [selectedRange, selectedCountry]);
-
+  }, [selectedRange, selectedCountry, maxRank]);  
+  
   // Draw the chart
   useEffect(() => {
     if (!data.length) return;
@@ -114,7 +122,7 @@ const BumpChart = ({
       .range([0, chartWidth])
       .padding(0.5);
 
-    const yScale = d3.scaleLinear().domain([1, 20]).range([0, chartHeight]);
+    const yScale = d3.scaleLinear().domain([1, maxRank]).range([0, chartHeight]);
 
     const sizeScale = d3.scaleSqrt().domain([0, maxNetWorth]).range([3, 15]);
     // const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(industries);
@@ -126,7 +134,9 @@ const BumpChart = ({
       .attr("class", "grid")
       .attr("transform", `translate(${margin.left}, ${margin.top})`)
       .call(
-        d3.axisLeft(yScale).tickValues(d3.range(1, 21)).tickSize(-chartWidth).tickFormat("")
+        d3.axisLeft(yScale).tickValues(d3.range(1, maxRank + 1))
+        .tickSize(-chartWidth)
+        .tickFormat("")
       )
       .selectAll(".tick line")
       .attr("stroke", "#d3d3d3")
@@ -211,13 +221,19 @@ const BumpChart = ({
             .style("left", `${event.pageX + 10}px`)
             .style("top", `${event.pageY + 10}px`)
             .html(
-              `<strong>${d.Name}</strong><br>Industry: ${d.Category}<br>Year: ${d.Year}<br>Rank: ${d.Rank}<br>Net Worth: $${d["Net Worth($US billion)"]}B`
+              `<strong>${d.Name}</strong><br>
+              Industry: ${d.Category}<br>
+              Year: ${d.Year}<br>
+              Global Rank: ${d.GlobalRank}<br>
+              ${selectedCountry ? `Domestic Rank: ${d.Rank || "N/A"}<br>` : ""}
+              Net Worth: $${d["Net Worth($US billion)"]}B`
             );
         })
         .on("mouseout", () => {
           tooltip.style("opacity", 0);
         })
         .on("click", (event, d) => {
+          if (!enableInteraction) return;
           if (clickedBillionaire === d.Name && selectedYear === d.Year) {
             // Reset clicked billionaire
             setClickedBillionaire(null);
@@ -231,7 +247,7 @@ const BumpChart = ({
           }
         });
     });
-  }, [data, dimensions, industries, clickedBillionaire]);
+  }, [data, dimensions, industries, clickedBillionaire, enableInteraction]);
 
   return (
     <div>

@@ -7,7 +7,11 @@ const Histogram = ({ selectedRange,
   useRange = false,
   widthScale = 0.45, 
   heightScale = 0.4,
-  titleFontSize = "16px" }) => {
+  titleFontSize = "16px",
+  showLabel = false,
+  dottedLine = false,
+  descriptionText = null,
+ }) => {
   const svgRef = useRef();
   const tooltipRef = useRef();
   const [data, setData] = useState([]);
@@ -91,6 +95,8 @@ const Histogram = ({ selectedRange,
     );
     const yAxis = d3.axisLeft(yScale).ticks(5);
 
+    const average = d3.mean(data, (d) => d.count);
+
     // Draw bars
     svg
       .append("g")
@@ -122,6 +128,64 @@ const Histogram = ({ selectedRange,
         tooltip.style("opacity", 0);
       });
 
+    if (showLabel) {
+      svg
+        .append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+        .selectAll("text")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("x", (d) => xScale(d.country) + xScale.bandwidth() / 2)
+        .attr("y", (d) => yScale(d.count) - 5)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "12px")
+        .attr("fill", "black")
+        .text((d) => d.count);
+    }
+
+    if (dottedLine) {
+      svg
+        .append("line")
+        .attr("x1", margin.left)
+        .attr("y1", margin.top + yScale(average))
+        .attr("x2", margin.left + chartWidth)
+        .attr("y2", margin.top + yScale(average))
+        .attr("stroke", "gray")
+        .attr("stroke-dasharray", "4 2")
+        .attr("stroke-width", 1.5);
+
+      // Label for the average line
+      svg
+        .append("text")
+        .attr("x", margin.left + chartWidth - 10)
+        .attr("y", margin.top + yScale(average) - 10)
+        .attr("text-anchor", "end")
+        .attr("font-size", "12px")
+        .attr("fill", "gray")
+        .text(`Average: ${average.toFixed(2)}`);
+    }
+
+    if (descriptionText) {
+      const textBoxWidth = 400;
+      const textBoxHeight = 400;
+
+      svg
+        .append("foreignObject")
+        .attr("x", margin.left + chartWidth - textBoxWidth - 10)
+        .attr("y", margin.top + 100)
+        .attr("width", textBoxWidth)
+        .attr("height", textBoxHeight)
+        .append("xhtml:div")
+        .style("font-size", "18px")
+        .style("line-height", "1.5")
+        .style("text-align", "left")
+        .style("color", "black")
+        .style("background-color", "none")
+        .style("padding", "5px")
+        .text(descriptionText);
+    }
+
     // Draw axes
     svg
       .append("g")
@@ -151,12 +215,7 @@ const Histogram = ({ selectedRange,
       .text(
         `Top 20 Countries by Number of Billionaires in Year ${title_year}`
       );
-      // .text(
-      //   `Top 20 Countries by Number of Billionaires in Year ${
-      //     selectedBillionaire ? selectedBillionaire.Year : selectedRange[1]
-      //   }`
-      // );
-  }, [data, dimensions]);
+  }, [data, dimensions, showLabel]);
 
   return (
     <div>
