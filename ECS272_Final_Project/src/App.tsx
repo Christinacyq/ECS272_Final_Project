@@ -24,7 +24,7 @@ const theme = createTheme({
 function Layout() {
   const [selectedRange, setRange] = useState([2020, 2024]);
   const [page2Range, setPage2Range] = useState([1997, 2023]);
-  const [page2Buttons, setPage2Buttons] = useState(['Left', 'Right']);
+  const [page2Button, setPage2Button] = useState("First Half");
   const [page2Title, setPage2Title] = useState("Billionaire Growth and World GDP");
   const [selectedCountry, setCountry] = useState("");
   const [selectedBillionaire, setSelectedBillionaire] = useState(null);
@@ -42,18 +42,18 @@ function Layout() {
 
   // console.log(selectedYear);
 
-  const handlePage2ButtonClick = (button) => {
-    if (button === 'Left') {
+  const handlePage2ButtonClick = () => {
+    if (page2Button === "First Half") {
       setPage2Range([1997, 2010]);
-      setPage2Buttons(['All', 'Right']);
+      setPage2Button("Second Half");
       setPage2Title("Billionaire Growth and World GDP between Year 1997-2010");
-    } else if (button === 'Right') {
+    } else if (page2Button === "Second Half") {
       setPage2Range([2010, 2023]);
-      setPage2Buttons(['Left', 'All']);
+      setPage2Button("All");
       setPage2Title("Billionaire Growth and World GDP between Year 2010-2023");
-    } else if (button === 'All') {
+    } else if (page2Button === "All") {
       setPage2Range([1997, 2023]);
-      setPage2Buttons(['Left', 'Right']);
+      setPage2Button("First Half");
       setPage2Title("Billionaire Growth and World GDP");
     }
   };
@@ -97,34 +97,29 @@ function Layout() {
           position: 'relative',
         }}
       >
-        <BarLineChart selectedRange={page2Range} title={page2Title}/>
+        <BarLineChart selectedRange={page2Range} title={page2Title} />
         <div
           style={{
             position: 'absolute',
-            bottom: '100px',
+            bottom: '60px',
             right: '20px',
-            display: 'flex',
-            gap: '10px',
           }}
         >
-          {page2Buttons.map((button, index) => (
-            <button
-              key={index}
-              onClick={() => handlePage2ButtonClick(button)}
-              style={{
-                padding: '10px 20px',
-                fontSize: '16px',
-                backgroundColor: '#8884d8',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
-              }}
-            >
-              {button}
-            </button>
-          ))}
+          <button
+            onClick={handlePage2ButtonClick}
+            style={{
+              padding: '10px 20px',
+              fontSize: '16px',
+              backgroundColor: '#8884d8',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+            }}
+          >
+            {page2Button}
+          </button>
         </div>
       </div>
 
@@ -148,6 +143,8 @@ function Layout() {
           widthScale={0.95}
           heightScale={0.95}
           titleFontSize='24px'
+          showLabel={true}
+          dottedLine={true}
         />
       </div>
 
@@ -169,9 +166,11 @@ function Layout() {
         selectedYear={2024}
         setSelectedYear={() => {}}
         colorScale={colorScale}
+        maxRank={6}
         widthScale={0.95}
         heightScale={0.95}
         hideCountrySelector={true}
+        enableInteraction={false}
       />
         
       </div>
