@@ -10,6 +10,7 @@ const Histogram = ({ selectedRange,
   titleFontSize = "16px",
   showLabel = false,
   dottedLine = false,
+  descriptionText = null,
  }) => {
   const svgRef = useRef();
   const tooltipRef = useRef();
@@ -163,6 +164,26 @@ const Histogram = ({ selectedRange,
         .attr("font-size", "12px")
         .attr("fill", "gray")
         .text(`Average: ${average.toFixed(2)}`);
+    }
+
+    if (descriptionText) {
+      const textBoxWidth = 400;
+      const textBoxHeight = 400;
+
+      svg
+        .append("foreignObject")
+        .attr("x", margin.left + chartWidth - textBoxWidth - 10)
+        .attr("y", margin.top + 100)
+        .attr("width", textBoxWidth)
+        .attr("height", textBoxHeight)
+        .append("xhtml:div")
+        .style("font-size", "18px")
+        .style("line-height", "1.5")
+        .style("text-align", "left")
+        .style("color", "black")
+        .style("background-color", "none")
+        .style("padding", "5px")
+        .text(descriptionText);
     }
 
     // Draw axes

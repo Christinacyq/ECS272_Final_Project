@@ -145,6 +145,7 @@ function Layout() {
           titleFontSize='24px'
           showLabel={true}
           dottedLine={true}
+          descriptionText={'USA has much more unique billionaires than other countries. Only USA, Germany, and China is above average of the unique billionaires count.'}
         />
       </div>
 
