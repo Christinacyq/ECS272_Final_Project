@@ -192,12 +192,12 @@ const SankeyDiagram = ({ selectedRange, selectedBillionaire, selectedYear, setSe
   
       // Title
       svg.append("text")
-        .attr("x", width / 2 - 50)
+        .attr("x", width / 2)
         .attr("y", 60)
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
         .attr("font-weight", "bold")
-        .text(`Sankey Diagram for Year ${yearToFilter}`);
+        .text(`Sankey Diagram for Top 20 Billionaires in Year ${yearToFilter}`);
   
     // Draw links
     svg.append("g")
