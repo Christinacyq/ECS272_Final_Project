@@ -34,7 +34,10 @@ function Layout() {
   useEffect(() => {
     d3.csv("data/concatenated_full.csv").then((allData) => {
       const uniqueIndustries = Array.from(new Set(allData.map((d) => d.Category)));
-      const scale = d3.scaleOrdinal(d3.schemeTableau10).domain(uniqueIndustries);
+      const colors = d3.schemeSet3.concat(d3.schemeCategory10); // Combine multiple color schemes
+      const scale = d3.scaleOrdinal()
+        .domain(uniqueIndustries)
+        .range(colors.slice(0, uniqueIndustries.length));
       setColorScale(() => scale);
       // console.log("Generated Color Scale:", scale.domain(), scale.range());
     });
