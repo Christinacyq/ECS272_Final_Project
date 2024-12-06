@@ -14,6 +14,7 @@ const BumpChart = ({
   heightScale = 0.8,
   hideCountrySelector = false,
   enableInteraction = true,
+  descriptionText = null,
 }) => {
   const svgRef = useRef();
   const tooltipRef = useRef();
@@ -247,6 +248,36 @@ const BumpChart = ({
           }
         });
     });
+
+    if (descriptionText) {
+      const textBoxWidth = 400;
+      const textBoxHeight = 410;
+
+      const textLines = descriptionText.split("\n");
+
+      const foreignObject = svg
+        .append("foreignObject")
+        .attr("x", margin.left + chartWidth - textBoxWidth - 30)
+        .attr("y", margin.top + chartHeight - textBoxHeight - 10)
+        .attr("width", textBoxWidth)
+        .attr("height", textBoxHeight);
+
+      const div = foreignObject
+        .append("xhtml:div")
+        .style("font-size", "14px")
+        .style("line-height", "1.5")
+        .style("text-align", "left")
+        .style("color", "black")
+        .style("background-color", "rgba(255, 255, 255, 0.8)") // Add slight background opacity
+        .style("padding", "5px")
+        .style("border-radius", "5px");
+
+      textLines.forEach((line) => {
+        div.append("p")
+          .style("margin", "0 0 10px 0") // Add spacing between paragraphs
+          .text(line);
+      });
+    }
   }, [data, dimensions, industries, clickedBillionaire, enableInteraction]);
 
   return (

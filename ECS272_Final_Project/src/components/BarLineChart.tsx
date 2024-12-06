@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as d3 from "d3";
 
-const BarLineChart = ({ selectedRange = [1997, 2023], title = "Billionaire Growth and World GDP" }) => {
+const BarLineChart = ({ 
+  selectedRange = [1997, 2023], 
+  title = "Billionaire Growth and World GDP", 
+  descriptionText = null,
+}) => {
   const svgRef = useRef();
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth * 0.95,
@@ -156,6 +160,38 @@ const BarLineChart = ({ selectedRange = [1997, 2023], title = "Billionaire Growt
         .style("font-size", "24px")
         .style("font-weight", "bold")
         .text((d) => d);
+
+      // console.log(descriptionText);
+  
+      if (descriptionText) {
+        const textBoxWidth = 400;
+        const textBoxHeight = 300;
+      
+        const textLines = descriptionText.split("\n"); 
+      
+        const foreignObject = svg
+          .append("foreignObject")
+          .attr("x", margin.left + 10)
+          .attr("y", margin.top)
+          .attr("width", textBoxWidth)
+          .attr("height", textBoxHeight);
+      
+        const div = foreignObject
+          .append("xhtml:div")
+          .style("font-size", "12px")
+          .style("line-height", "1.5")
+          .style("color", "black")
+          .style("background-color", "none")
+          .style("padding", "5px")
+          .style("text-align", "left");
+      
+        textLines.forEach((line) => {
+          div.append("p")
+            .style("margin", "0 0 10px 0")
+            .text(line);
+        });
+      }
+      
     };
 
     d3.csv("/data/Billionaire_Growth_GDP.csv").then((data) => {

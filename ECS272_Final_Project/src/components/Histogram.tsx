@@ -167,24 +167,34 @@ const Histogram = ({ selectedRange,
     }
 
     if (descriptionText) {
-      const textBoxWidth = 400;
-      const textBoxHeight = 400;
-
-      svg
+      const textBoxWidth = 500;
+      const textBoxHeight = 500;
+    
+      const textLines = descriptionText.split("\n");
+    
+      const foreignObject = svg
         .append("foreignObject")
         .attr("x", margin.left + chartWidth - textBoxWidth - 10)
-        .attr("y", margin.top + 100)
+        .attr("y", margin.top + 50)
         .attr("width", textBoxWidth)
-        .attr("height", textBoxHeight)
+        .attr("height", textBoxHeight);
+    
+      const div = foreignObject
         .append("xhtml:div")
-        .style("font-size", "18px")
+        .style("font-size", "15px")
         .style("line-height", "1.5")
         .style("text-align", "left")
         .style("color", "black")
         .style("background-color", "none")
-        .style("padding", "5px")
-        .text(descriptionText);
+        .style("padding", "5px");
+    
+      textLines.forEach((line) => {
+        div.append("p")
+          .style("margin", "0 0 10px 0")
+          .text(line);
+      });
     }
+    
 
     // Draw axes
     svg
