@@ -164,7 +164,7 @@ const BarLineChart = ({
       // console.log(descriptionText);
   
       if (descriptionText) {
-        const textBoxWidth = 400;
+        const textBoxWidth = 420;
         const textBoxHeight = 300;
       
         const textLines = descriptionText.split("\n"); 
@@ -181,7 +181,7 @@ const BarLineChart = ({
           .style("font-size", "12px")
           .style("line-height", "1.5")
           .style("color", "black")
-          .style("background-color", "none")
+          .style("background-color", "rgba(255, 255, 255, 0.2)")
           .style("padding", "5px")
           .style("text-align", "left");
       
