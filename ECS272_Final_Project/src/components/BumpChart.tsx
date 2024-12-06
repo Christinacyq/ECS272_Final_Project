@@ -268,7 +268,7 @@ const BumpChart = ({
         .style("line-height", "1.5")
         .style("text-align", "left")
         .style("color", "black")
-        .style("background-color", "rgba(255, 255, 255, 0.8)") // Add slight background opacity
+        .style("background-color", "rgba(255, 255, 255, 0.8)")
         .style("padding", "5px")
         .style("border-radius", "5px");
 

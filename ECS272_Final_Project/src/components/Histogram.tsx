@@ -185,7 +185,7 @@ const Histogram = ({ selectedRange,
         .style("line-height", "1.5")
         .style("text-align", "left")
         .style("color", "black")
-        .style("background-color", "none")
+        .style("background-color", "rgba(235, 235, 235, 0.5)")
         .style("padding", "5px");
     
       textLines.forEach((line) => {

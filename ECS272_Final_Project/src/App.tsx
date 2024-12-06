@@ -56,12 +56,12 @@ function Layout() {
       setPage2Range([1997, 2010]);
       setPage2Button("Second Half");
       setPage2Title("Billionaire Growth and World GDP between Year 1997-2010");
-      setPage2Text("");
+      setPage2Text(textdata.page2textfirst);
     } else if (page2Button === "Second Half") {
       setPage2Range([2010, 2023]);
       setPage2Button("All");
       setPage2Title("Billionaire Growth and World GDP between Year 2010-2023");
-      setPage2Text("");
+      setPage2Text(textdata.page2textsecond);
     } else if (page2Button === "All") {
       setPage2Range([1997, 2023]);
       setPage2Button("First Half");
