@@ -10,6 +10,7 @@ const BumpChart = ({
   setSelectedYear,
   colorScale,
   maxRank = 20,
+  title = null,
   widthScale = 0.5,
   heightScale = 0.8,
   hideCountrySelector = false,
@@ -159,7 +160,7 @@ const BumpChart = ({
       .attr("text-anchor", "middle")
       .attr("font-size", "18px")
       .attr("font-weight", "bold")
-      .text(`Top 20 Billionaires' Rank From ${selectedRange[0]} to ${selectedRange[1]}`);
+      .text(title || `Top 20 Billionaires' Rank From ${selectedRange[0]} to ${selectedRange[1]}`);
 
     // Legend
     const legend = svg

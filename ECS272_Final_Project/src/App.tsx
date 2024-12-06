@@ -185,6 +185,7 @@ function Layout() {
         hideCountrySelector={true}
         enableInteraction={false}
         descriptionText={textdata.page4text}
+        title={"Top Billionaires' Rank in South Korea From 2020 to 2024"}
       />
         
       </div>
