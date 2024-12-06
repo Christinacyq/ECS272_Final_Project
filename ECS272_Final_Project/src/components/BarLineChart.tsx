@@ -117,7 +117,7 @@ const BarLineChart = ({
         .append("path")
         .attr("class", "line-path")
         .attr("fill", "none")
-        .attr("stroke", "#82ca9d")
+        .attr("stroke", "black")
         .attr("stroke-width", 2)
         .attr("d", line(filteredData))
         .merge(linePath)
